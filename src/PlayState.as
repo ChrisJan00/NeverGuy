@@ -20,7 +20,6 @@ package
     public class PlayState extends FlxState
     {
 		[Embed(source = 'img/Tiles.png')] protected var ImgTiles:Class;
-		[Embed(source = 'img/disk.png')] protected var ImgDisk:Class;
 
 		protected var LevelMap:Class;
 		

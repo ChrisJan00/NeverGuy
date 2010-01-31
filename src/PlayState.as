@@ -37,6 +37,7 @@ package
 		private var _traps:Array;
 		private var _bouncers:Array;
 		private var _rubberbands:Array;
+		private var _fallingspikes:Array;
 		
 	    public static var lyrStage:FlxLayer;
         public static var lyrSprites:FlxLayer;
@@ -54,7 +55,7 @@ package
             lyrHUD = new FlxLayer;
            
 			
-            _player = new Player(48, 240);
+            _player = new Player(48, 240, this);
             lyrSprites.add(_player);
 			
 			_lastsavepoint = null;
@@ -109,6 +110,7 @@ package
 			_traps = new Array;
 			_bouncers = new Array;
 			_rubberbands = new Array;
+			_fallingspikes = new Array;
 			
 			
 			
@@ -162,6 +164,8 @@ package
 								case "20":
 								case "21":
 								case "22":
+								case "23":
+								case "24":
 									BlockMap += "0,";
 									SpikeMap += "0,";
 									FakeMap += "0,";
@@ -208,6 +212,12 @@ package
 								case "22":
 									_rubberbands.push( lyrStage.add(new RubberBand(16 * col, 16 * row, 135)));
 									break;
+								case "23":
+									_fallingspikes.push( lyrStage.add(new FallingSpikes(16 * col, 16 * row, 1)));
+									break;
+								case "24":
+									_fallingspikes.push( lyrStage.add(new FallingSpikes(16 * col, 16 * row, 2)));
+									break;
 							}
 						col += 1;
 					}
@@ -238,6 +248,9 @@ package
 			FlxG.overlapArray( _bouncers, _player, Bounce);
 			FlxG.overlapArray( _rubberbands, _player, BounceBand);
 			
+			for each( var fallingspike:FallingSpikes in _fallingspikes) {
+				fallingspike.checkActivate(_player);
+			}
 			
 			// don't fall away
 			if (_player.y > 288-16) { _player.y = 288-16 }
@@ -260,10 +273,23 @@ package
 					_player.save(savepoint.x, savepoint.y);
 					_lastsavepoint =  savepoint;
 					_lastsavepoint.activate();
+					for each (var fallingspike:FallingSpikes in _fallingspikes) {
+						fallingspike.save();
+					}
 				}
 				
 			}
 		}
+		
+		public function reload():void
+		{
+			_player.reload();
+			for each (var fallingspike:FallingSpikes in _fallingspikes)
+			{
+				fallingspike.reload();
+			}
+		}
+		
 		public function TrapHit(trap:Trap, P:Player):void
 		{
 			if (_player.health > 0) {

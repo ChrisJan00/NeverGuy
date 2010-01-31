@@ -16,9 +16,13 @@
 		private var _savestate_x:int = 48;
 		private var _savestate_y:int = 240;
 		private var _MaxVelocity_walking:int = 200;
-        public function  Player(X:Number,Y:Number):void
+		private var _playstate:PlayState;
+		
+        public function  Player(X:Number,Y:Number, p:PlayState):void
         {
-            super(X,Y);
+            super(X, Y);
+			
+			_playstate = p;
             loadGraphic(ImgPlayer, true, true, 16, 16);
      
 			_MaxVelocity_walking = 200;
@@ -126,7 +130,7 @@
             }
             else            
             {
-				if (health <= 0) { reload(); }
+				if (health <= 0) { _playstate.reload(); }
                 if (velocity.y != 0)
                 {
                     play("jump");

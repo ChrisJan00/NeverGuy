@@ -6,7 +6,7 @@
 	public class MenuState extends FlxState
 	{
 		private var _option:int = 0;
-		private var _numoptions:int = 4;
+		private var _numoptions:int = 5;
 		private var _marker:FlxText;
 		override public function MenuState() 
 		{
@@ -16,7 +16,7 @@
 			txt.setFormat(null, 8, 0xFFFFFFFF, "center");
 			this.add(txt);
 			
-			var textoption:Array = [ "only blocks and spikes", "fake blocks, invisible blocks", "variations", "bouncing blocks" ];
+			var textoption:Array = [ "only blocks and spikes", "fake blocks, invisible blocks", "variations", "bouncing blocks", "falling spikes" ];
 			for (var i:Number = 0; i < _numoptions; i++)
 			{
 				txt = new FlxText(0, i * 16 + 10, FlxG.width, textoption[i] );
@@ -64,6 +64,9 @@
 				break;
 				case 3:
 					FlxG.switchState(Bounce_PlayState);
+				break;
+				case 4:
+					FlxG.switchState(Falling_PlayState);
 				break;
 			}
 		}

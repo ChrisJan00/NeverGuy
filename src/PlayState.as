@@ -26,11 +26,13 @@ package
 		protected var BlockMap:String;
         protected var FakeMap:String;
         protected var SpikeMap:String;
+		protected var PlatformsMap:String;
 		
         private var _player:Player;
         private var _block_map:FlxTilemap;
 		private var _spike_map:FlxTilemap;
 		private var _fake_map:FlxTilemap;
+		private var _platforms_map:FlxTilemap;
 		private var _savepoints:Array;
 		//private var _savepoint_list:Array;
 		private var _lastsavepoint:SavePoint;
@@ -38,6 +40,7 @@ package
 		private var _bouncers:Array;
 		private var _rubberbands:Array;
 		private var _fallingspikes:Array;
+		private var _platforms:Array;
 		
 	    public static var lyrStage:FlxLayer;
         public static var lyrSprites:FlxLayer;
@@ -79,15 +82,12 @@ package
 			_fake_map.loadMap(FakeMap, ImgTiles, 16);
             _fake_map.drawIndex = 1;
             _fake_map.collideIndex = 1;
-
+			_platforms_map = new FlxTilemap;
+			_platforms_map.loadMap(PlatformsMap, ImgTiles, 16);
+            _platforms_map.drawIndex = 1;
+            _platforms_map.collideIndex = 1;
 			
-			//_savepoints = new Array;
-			//for each(var point:Array in _savepoint_list)
-			//{
-				//_savepoints.push( lyrStage.add(new FlxSprite(16 * point[0], 16 * point[1], ImgDisk) ) );
-				//_savepoints.push( lyrStage.add(new SavePoint(16 * point[0], 16 * point[1])));
-			//}
-
+			parsePlatforms();
 			
             lyrStage.add(_block_map);
 			lyrStage.add(_spike_map);
@@ -105,6 +105,8 @@ package
 			BlockMap = new String("");
 			SpikeMap = new String("");
 			FakeMap = new String("");
+			PlatformsMap = new String("");
+			
 			//_savepoint_list = new Array;
 			_savepoints = new Array;
 			_traps = new Array;
@@ -123,7 +125,8 @@ package
 				rows = rows.substr(0, rows.length - 1);
 				if (rows.length > 0) {	
 					col = 0;
-					for each (var tiles:String in rows.split(",")) {							
+					for each (var tiles:String in rows.split(",")) {	
+							// "Normal" maps
 							switch (tiles) {
 								case "0":
 									BlockMap += "0,";
@@ -151,27 +154,14 @@ package
 									SpikeMap += "0,";
 									FakeMap += tiles+",";
 									break;
-								case "7":
-								case "10":
-								case "11":
-								case "12":
-								case "13":
-								case "15":
-								case "16":
-								case "17":
-								case "18":
-								case "19":
-								case "20":
-								case "21":
-								case "22":
-								case "23":
-								case "24":
+								default:
 									BlockMap += "0,";
 									SpikeMap += "0,";
 									FakeMap += "0,";
 									break;
 							}
 							
+							// special block arrays
 							switch (tiles) {
 								case "7":
 									_savepoints.push( lyrStage.add(new SavePoint(16 * col, 16 * row)));
@@ -219,19 +209,48 @@ package
 									_fallingspikes.push( lyrStage.add(new FallingSpikes(16 * col, 16 * row, 2)));
 									break;
 							}
+							
+							// moving platforms
+							switch (tiles)
+							{
+								case "25":
+								case "26":
+								case "27":
+								case "28":
+								case "29":
+								case "30":
+								case "32":
+								case "33":
+								case "34":
+								case "35":
+								case "36":
+									PlatformsMap += tiles + ",";
+									break;
+								default:
+									PlatformsMap += "0,";
+									break;
+							}
 						col += 1;
 					}
 					BlockMap = BlockMap.substr(0, BlockMap.length - 1) + "\n";
 					SpikeMap = SpikeMap.substr(0, SpikeMap.length - 1) + "\n";
 					FakeMap = FakeMap.substr(0, FakeMap.length - 1) + "\n";
-					
+					PlatformsMap = PlatformsMap.substr(0, PlatformsMap.length - 1) + "\n";
 					
 				}
 				row += 1;
-			}
-			
+			}			
 		}
         
+		public function parsePlatforms():void
+		{
+			_platforms = new Array;
+			for (var y:Number = 0; y < _platforms_map.heightInTiles; y++)
+				for (var x:Number = 0; x < _platforms_map.widthInTiles; x++) 
+						if (_platforms_map.getTile(x, y) >= 32 && _platforms_map.getTile(x, y) <= 36)
+							_platforms.push( lyrStage.add( new MovingPlatform(x, y, _platforms_map) ) );
+		}
+		
         override public function update():void
         {
 		   super.update();

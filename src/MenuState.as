@@ -6,7 +6,7 @@
 	public class MenuState extends FlxState
 	{
 		private var _option:int = 0;
-		private var _numoptions:int = 5;
+		private var _numoptions:int = 6;
 		private var _marker:FlxText;
 		override public function MenuState() 
 		{
@@ -67,6 +67,9 @@
 				break;
 				case 4:
 					FlxG.switchState(Falling_PlayState);
+				break;
+				case 5:
+					FlxG.switchState(Moving_PlayState);
 				break;
 			}
 		}
